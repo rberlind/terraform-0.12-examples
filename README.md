@@ -13,7 +13,7 @@ In particular, the setting of a Name tag for the VPC is done with this code:
     Name = var.vpc_name
   }
 ```
-Note that this code refers to the variable called name directly (`Name = var.vpc_name`) without using interpolation which would have used `${var.vpc_name}`. It also directly refers to the id of the VPC (`vpc_id = aws_vpc.my_vpc.id`) in the subnet resource, to the id of the subnet (`subnet_id = aws_subnet.my_subnet.id`) in the network interface resource, and to the id of the network interface (`network_interface_id = aws_network_interface.foo.id`) in the EC2 instance. In a similar fashion, the output refers to the private_dns attribute (`value = aws_instance.foo.private_dns`) of the EC2 intance.
+Note that this code refers to the variable called name directly (`Name = var.vpc_name`) without using interpolation which would have used `${var.vpc_name}`. It also directly refers to the id of the VPC (`vpc_id = aws_vpc.my_vpc.id`) in the subnet resource, to the id of the subnet (`subnet_id = aws_subnet.my_subnet.id`) in the network interface resource, and to the id of the network interface (`network_interface_id = aws_network_interface.foo.id`) in the EC2 instance. In a similar fashion, the output refers to the private_dns attribute (`value = aws_instance.foo.private_dns`) of the EC2 instance.
 
 Additionally, it uses `=` when setting the tags attributes of all the resources to the maps that includes the Name key/value pair. This is required in Terraform 0.12 since tags is an attribute rather than a block which would not use `=`. (Note that cidr_block is an attribute despite the inclusion of "block" in its name.) In contrast, we do not include `=` when specifying the network_interface block of the EC2 instance since this is a block.
 
