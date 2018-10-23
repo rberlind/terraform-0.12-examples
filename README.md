@@ -3,11 +3,10 @@ This repository contains some Terraform 0.12 examples that demonstrate new HCL f
 
 ## AWS Instance With Network
 The [AWS VPC](./aws-instance-with-network) example creates an AWS VPC, a subnet, a network interface, and an EC2 instance. It illustrates the following new features:
-1. Referencing of Terraform variables without interpolation.
-1. Referencing of resource attributes witout interpolation in other resources and outputs.
+1. Referencing of Terraform variables and resource attributes without interpolation using [First Class Expressions](https://www.hashicorp.com/blog/terraform-0-12-preview-first-class-expressions).
 1. The need to include `=` when setting the value for attributes of type map or list.
 
-In particular, the setting of a Name tag for the VPC is done with this code:
+In particular, the setting of the Name tag for the VPC is done with this code:
 ```
   tags = {
     Name = var.vpc_name
