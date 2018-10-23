@@ -6,15 +6,15 @@ The [AWS VPC](./aws-instance-with-network) example creates an AWS VPC, a subnet,
 1. Referencing of Terraform variables and resource attributes without interpolation using [First Class Expressions](https://www.hashicorp.com/blog/terraform-0-12-preview-first-class-expressions).
 1. The need to include `=` when setting the value for attributes of type map or list.
 
-In particular, the setting of the Name tag for the VPC is done with this code:
-```
-  tags = {
-    Name = var.vpc_name
-  }
-```
-Note that this code refers to the variable called name directly (`Name = var.vpc_name`) without using interpolation which would have used `${var.vpc_name}`. It also directly refers to the id of the VPC (`vpc_id = aws_vpc.my_vpc.id`) in the subnet resource, to the id of the subnet (`subnet_id = aws_subnet.my_subnet.id`) in the network interface resource, and to the id of the network interface (`network_interface_id = aws_network_interface.foo.id`) in the EC2 instance. In a similar fashion, the output refers to the private_dns attribute (`value = aws_instance.foo.private_dns`) of the EC2 instance.
+In particular, the Terraform code refers to the variable called vpc_name directly (`Name = var.vpc_name`) without using interpolation which would have used `${var.vpc_name}`. Other code in this example also directly refers to the id of the VPC (`vpc_id = aws_vpc.my_vpc.id`) in the subnet resource, to the id of the subnet (`subnet_id = aws_subnet.my_subnet.id`) in the network interface resource, and to the id of the network interface (`network_interface_id = aws_network_interface.foo.id`) in the EC2 instance. In a similar fashion, the output refers to the private_dns attribute (`value = aws_instance.foo.private_dns`) of the EC2 instance.
 
-Additionally, it uses `=` when setting the tags attributes of all the resources to the maps that includes the Name key/value pair. This is required in Terraform 0.12 since tags is an attribute rather than a block which would not use `=`. (Note that cidr_block is an attribute despite the inclusion of "block" in its name.) In contrast, we do not include `=` when specifying the network_interface block of the EC2 instance since this is a block.
+Additionally, the code uses `=` when setting the tags attributes of all the resources to the maps that include the Name key/value pairs.  For example the tags for the subnet are added with:
+```
+tags = {
+  Name = "tf-0.12-example"
+}
+```
+This is required in Terraform 0.12 since tags is an attribute rather than a block which would not use `=`. In contrast, we do not include `=` when specifying the network_interface block of the EC2 instance since this is a block.
 
 It is not easy to distinguish blocks from attributes of type map when looking at pre-0.12 Terraform code. But if you look at the documentation for a resource, all blocks have their own sub-topic describing the block. So, there is a [Network Interfaces](https://www.terraform.io/docs/providers/aws/r/instance.html#network-interfaces) sub-topic for the network_interface block of the aws_instance resource, but there is no sub-topic for the tags attribute of the same resource.
 
@@ -38,6 +38,14 @@ output "public_addresses_new" {
   ]
 }
 ```
+Both of these give an output like this:
+```
+public_addresses_new = [
+  "ec2-54-159-217-16.compute-1.amazonaws.com",
+  "ec2-35-170-33-78.compute-1.amazonaws.com",
+  "ec2-18-233-162-38.compute-1.amazonaws.com",
+]
+```
 
 We also demonstrate the use of the **for** expression to convert the availability zones contained in the azs variable to upper case. We first do this in a list:
 ```
@@ -49,5 +57,22 @@ and then in a map:
 ```
 output "upper-azs-map" {
   value = {for z in var.azs: z => upper(z)}
+}
+```
+The first gives the output
+which gives the output:
+```
+upper-azs-list = [
+  "A",
+  "B",
+  "C",
+]
+```
+while the second gives:
+```
+upper-azs-map = {
+  "a" = "A"
+  "b" = "B"
+  "c" = "C"
 }
 ```
