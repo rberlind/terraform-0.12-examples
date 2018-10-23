@@ -23,13 +23,13 @@ For more on the difference between attributes and blocks, see [Attributes and Bl
 ## For Expressions
 The [for-expressions](./for-expressions) example illustrates how the new [For Expression](https://github.com/hashicorp/terraform/blob/v0.12-alpha/website/docs/configuration/expressions.html.md#for-expressions) can be used to iterate across multiple items in lists. It does this for several outputs, iterating across 3 instances of a particular aws_instance resource to get a list of all 3 public DNS addresses and across the variable azs of type list that provides the availability zones the EC2 instances should be created in.
 
-We actually generate the outputs that show the list of public DNS addresses for the 3 EC2 instances in two ways, first using the *old splat syntax*:
+We actually generate the outputs that show the list of public DNS addresses for the 3 EC2 instances in two ways, first using the **old splat syntax**:
 ```
 output "public_addresses_old" {
   value = aws_instance.ubuntu.*.public_dns
 }
 ```
-and then using the new *for* expression:
+and then using the new **for** expression:
 ```
 output "public_addresses_new" {
   value = [
@@ -39,7 +39,7 @@ output "public_addresses_new" {
 }
 ```
 
-We also demonstrate the use of the *for* expression to convert the availability zones contained in the azs variable to upper case. We first do this in a list:
+We also demonstrate the use of the **for** expression to convert the availability zones contained in the azs variable to upper case. We first do this in a list:
 ```
 output "upper-azs-list" {
   value = [for z in var.azs: upper(z)]
