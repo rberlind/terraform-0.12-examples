@@ -1,8 +1,8 @@
 # Terraform 0.12 Examples
 This repository contains some Terraform 0.12 examples that demonstrate new HCL features and other Terraform enhancements that are being added to Terraform 0.12. Each sub-directory contains a separate example that can be run separately from the others by running `terraform init` followed by `terraform apply`.
 
-## AWS Instance With Network
-The [AWS VPC](./aws-instance-with-network) example creates an AWS VPC, a subnet, a network interface, and an EC2 instance. It illustrates the following new features:
+## First Class Expressions Example
+The [AWS VPC](./first-class-expressions) example creates an AWS VPC, a subnet, a network interface, and an EC2 instance. It illustrates the following new features:
 1. Referencing of Terraform variables and resource attributes without interpolation using [First Class Expressions](https://www.hashicorp.com/blog/terraform-0-12-preview-first-class-expressions).
 1. The need to include `=` when setting the value for attributes of type map or list.
 
@@ -20,7 +20,7 @@ It is not easy to distinguish blocks from attributes of type map when looking at
 
 For more on the difference between attributes and blocks, see [Attributes and Blocks](https://github.com/hashicorp/terraform/blob/v0.12-alpha/website/docs/configuration/syntax.html.md#attributes-and-blocks)
 
-## For Expressions
+## For Expressions Examples
 The [for-expressions](./for-expressions) example illustrates how the new [For Expression](https://github.com/hashicorp/terraform/blob/v0.12-alpha/website/docs/configuration/expressions.html.md#for-expressions) can be used to iterate across multiple items in lists. It does this for several outputs, iterating across 3 instances of a particular aws_instance resource to get a list of all 3 public DNS addresses and across the variable azs of type list that provides the availability zones the EC2 instances should be created in.
 
 We actually generate the outputs that show the list of public DNS addresses for the 3 EC2 instances in two ways, first using the **old splat syntax**:
