@@ -1,12 +1,24 @@
 # Terraform 0.12 Examples
 This repository contains some Terraform 0.12 examples that demonstrate new HCL features and other Terraform enhancements that are being added to Terraform 0.12. Each sub-directory contains a separate example that can be run separately from the others by running `terraform init` followed by `terraform apply`.
 
+## Setting Up
+1. Determine the location of the Terraform binary in your path. On a Mac of Linux machine, run `which terraform`. On a Windows machine, run `where terraform`.
+1. Move your current copy of the Terraform binary to a different location outside your path and remember where so you can restore it after using the Terraform 0.12 alpha. Also note the old location.
+1. Download the Terraform 0.12 alpha for your OS from https://releases.hashicorp.com/terraform/0.12.0-alpha1.
+1. Unzip the file and copy the terraform or terraform.exe binary to the location where your original terraform binary was. If you did not previously have the terraform binary deployed, copy it to a location within your path or edit your PATH environment variable to include the directory you put it in.
+1. Create a directory for the included providers and copy them to it:
+  1. On a Mac, run `mkdir -p ~/.terraform.d/plugins/darwin_amd64` followed by `cp <install_directory>/terraform_0.12.0-alpha1_darwin_amd64/terraform-provider-* ~/.terraform.d/plugins/darwin_amd64/.`
+  1. On a Linux machine, run `mkdir -p ~/.terraform.d/plugins/linux_amd64` followed by `cp <install_directory>/terraform_0.12.0-alpha1_darwin_amd64/terraform-provider-* ~/.terraform.d/plugins/amd_amd64/.`
+  1. On a Windows laptop, run `mkdir %USERPROFILE%\terraform.d\plugins\windows_amd64` followed by `cp <install_directory>/terraform_0.12.0-alpha1_darwin_amd64/terraform-provider-* %USERPROFILE%/terraform.d/plugins/amd_amd64/.`  
+1. Clone this repository to your laptop with the command `git clone https://github.com/rberlind/terraform-0.12-examples.git`.
+1. Use `cd terraform-0.12-examples` to change into the directory that was created.
+
 ## First Class Expressions Example
-The [AWS VPC](./first-class-expressions) example creates an AWS VPC, a subnet, a network interface, and an EC2 instance. It illustrates the following new features:
+The [First Class Expressions](./first-class-expressions) example creates an AWS VPC, a subnet, a network interface, and an EC2 instance. It illustrates the following new features:
 1. Referencing of Terraform variables and resource attributes without interpolation using [First Class Expressions](https://www.hashicorp.com/blog/terraform-0-12-preview-first-class-expressions).
 1. The need to include `=` when setting the value for attributes of type map or list.
 
-In particular, the Terraform code refers to the variable called vpc_name directly (`Name = var.vpc_name`) without using interpolation which would have used `${var.vpc_name}`. Other code in this example also directly refers to the id of the VPC (`vpc_id = aws_vpc.my_vpc.id`) in the subnet resource, to the id of the subnet (`subnet_id = aws_subnet.my_subnet.id`) in the network interface resource, and to the id of the network interface (`network_interface_id = aws_network_interface.foo.id`) in the EC2 instance. In a similar fashion, the output refers to the private_dns attribute (`value = aws_instance.foo.private_dns`) of the EC2 instance.
+In particular, the Terraform code that creates the VPC refers to the variable called vpc_name directly (`Name = var.vpc_name`) without using interpolation which would have used `${var.vpc_name}`. Other code in this example also directly refers to the id of the VPC (`vpc_id = aws_vpc.my_vpc.id`) in the subnet resource, to the id of the subnet (`subnet_id = aws_subnet.my_subnet.id`) in the network interface resource, and to the id of the network interface (`network_interface_id = aws_network_interface.foo.id`) in the EC2 instance. In a similar fashion, the output refers to the private_dns attribute (`value = aws_instance.foo.private_dns`) of the EC2 instance.
 
 Additionally, the code uses `=` when setting the tags attributes of all the resources to the maps that include the Name key/value pairs.  For example the tags for the subnet are added with:
 ```
@@ -76,3 +88,6 @@ upper-azs-map = {
   "c" = "C"
 }
 ```
+
+## Cleanup
+1. When done with the Terraform 0.12 alpha, remove the providers from the terraform.d or .terraform.d directory under your home directory and replace the Terraform 0.12 binary with the Terraform binary you were previously using.
