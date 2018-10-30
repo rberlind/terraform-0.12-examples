@@ -28,8 +28,7 @@ variable "interface_ips" {
   default = ["172.16.10.100"]
 }
 
-module "network" {
-  source = "./network"
+locals {
   network_config = {
     vpc_name = var.vpc_name
     vpc_cidr = var.vpc_cidr
@@ -38,15 +37,20 @@ module "network" {
   }
 }
 
+module "network" {
+  source = "./network"
+  network_config = local.network_config
+}
+
 resource "aws_network_interface" "rvt" {
-  subnet_id = module.network.subnet.id
+  subnet_id = module.network.subnet_id
   private_ips = var.interface_ips
   tags = {
     Name = "rvt-example-interface"
   }
 }
 
-resource "aws_instance" "rvt" {
+/*resource "aws_instance" "rvt" {
   ami = "ami-22b9a343" # us-west-2
   instance_type = "t2.micro"
 
@@ -58,7 +62,11 @@ resource "aws_instance" "rvt" {
     network_interface_id = aws_network_interface.rvt.id
     device_index = 0
   }
-}
+}*/
+
+/*output "instance_private_dns" {
+  value = aws_instance.rvt.private_dns
+}*/
 
 output "vpc" {
   value = module.network.vpc
@@ -68,6 +76,6 @@ output "subnet" {
   value = module.network.subnet
 }
 
-output "instance_private_dns" {
-  value = aws_instance.rvt.private_dns
+output "interface_sec_groups" {
+  value = aws_network_interface.rvt.security_groups
 }
