@@ -346,4 +346,4 @@ In summary, the error messages for parsing Terraform JSON configuraitons are muc
 
 
 ## Cleanup
-1. When done with the Terraform 0.12 alpha, remove the providers from the terraform.d or .terraform.d directory under your home directory and replace the Terraform 0.12 binary with the Terraform binary you were previously using.
+1. When done with the Terraform 0.12 alpha, delete the terraform.d or .terraform.d directory under your home directory and rename the original version of the directory to what it was before. Replace the Terraform 0.12 binary with the Terraform binary you were previously using in your path.
