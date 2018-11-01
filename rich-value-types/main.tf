@@ -50,7 +50,7 @@ resource "aws_network_interface" "rvt" {
   }
 }
 
-/*resource "aws_instance" "rvt" {
+resource "aws_instance" "rvt" {
   ami = "ami-22b9a343" # us-west-2
   instance_type = "t2.micro"
 
@@ -62,11 +62,11 @@ resource "aws_network_interface" "rvt" {
     network_interface_id = aws_network_interface.rvt.id
     device_index = 0
   }
-}*/
+}
 
-/*output "instance_private_dns" {
+output "instance_private_dns" {
   value = aws_instance.rvt.private_dns
-}*/
+}
 
 output "vpc" {
   value = module.network.vpc

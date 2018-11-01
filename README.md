@@ -4,12 +4,12 @@ This repository contains some Terraform 0.12 examples that demonstrate new HCL f
 ## Setting Up
 1. Determine the location of the Terraform binary in your path. On a Mac of Linux machine, run `which terraform`. On a Windows machine, run `where terraform`.
 1. Move your current copy of the Terraform binary to a different location outside your path and remember where so you can restore it after using the Terraform 0.12 alpha. Also note the old location.
-1. Download the Terraform 0.12 alpha for your OS from https://releases.hashicorp.com/terraform/0.12.0-alpha1.
+1. Download the Terraform 0.12 alpha for your OS from https://releases.hashicorp.com/terraform/0.12.0-alpha2.
 1. Unzip the file and copy the terraform or terraform.exe binary to the location where your original terraform binary was. If you did not previously have the terraform binary deployed, copy it to a location within your path or edit your PATH environment variable to include the directory you put it in.
 1. Create a directory for the included providers and copy them to it:
-  1. On a Mac, run `mkdir -p ~/.terraform.d/plugins/darwin_amd64` followed by `cp <install_directory>/terraform_0.12.0-alpha1_darwin_amd64/terraform-provider-* ~/.terraform.d/plugins/darwin_amd64/.`
-  1. On a Linux machine, run `mkdir -p ~/.terraform.d/plugins/linux_amd64` followed by `cp <install_directory>/terraform_0.12.0-alpha1_darwin_amd64/terraform-provider-* ~/.terraform.d/plugins/amd_amd64/.`
-  1. On a Windows laptop, run `mkdir %USERPROFILE%\terraform.d\plugins\windows_amd64` followed by `cp <install_directory>/terraform_0.12.0-alpha1_darwin_amd64/terraform-provider-* %USERPROFILE%/terraform.d/plugins/amd_amd64/.`  
+  1. On a Mac, run `mkdir -p ~/.terraform.d/plugins/darwin_amd64` followed by `cp <install_directory>/terraform_0.12.0-alpha2_darwin_amd64/terraform-provider-* ~/.terraform.d/plugins/darwin_amd64/.`
+  1. On a Linux machine, run `mkdir -p ~/.terraform.d/plugins/linux_amd64` followed by `cp <install_directory>/terraform_0.12.0-alpha2_darwin_amd64/terraform-provider-* ~/.terraform.d/plugins/amd_amd64/.`
+  1. On a Windows laptop, run `mkdir %USERPROFILE%\terraform.d\plugins\windows_amd64` followed by `cp <install_directory>/terraform_0.12.0-alpha2_darwin_amd64/terraform-provider-* %USERPROFILE%/terraform.d/plugins/amd_amd64/.`  
 1. Clone this repository to your laptop with the command `git clone https://github.com/rberlind/terraform-0.12-examples.git`.
 1. Use `cd terraform-0.12-examples` to change into the directory that was created.
 
@@ -33,48 +33,77 @@ It is not easy to distinguish blocks from attributes of type map when looking at
 For more on the difference between attributes and blocks, see [Attributes and Blocks](https://github.com/hashicorp/terraform/blob/v0.12-alpha/website/docs/configuration/syntax.html.md#attributes-and-blocks)
 
 ## For Expressions Examples
-The [for-expressions](./for-expressions) example illustrates how the new [For Expression](https://github.com/hashicorp/terraform/blob/v0.12-alpha/website/docs/configuration/expressions.html.md#for-expressions) can be used to iterate across multiple items in lists. It does this for several outputs, iterating across 3 instances of a particular aws_instance resource to get a list of all 3 public DNS addresses and across the variable azs of type list that provides the availability zones the EC2 instances should be created in.
+The [for-expressions](./for-expressions) example illustrates how the new [For Expression](https://github.com/hashicorp/terraform/blob/v0.12-alpha/website/docs/configuration/expressions.html.md#for-expressions) can be used to iterate across multiple items in lists. It does this for several outputs, illustrating the usefulness and power of the **for** expression in several ways.  We use two tf files in this example:
+1. main.tf creates a VPC, subnet, and 3 EC2 instances and then generates outputs related to the DNS and IP addresses of the EC2 instances.
+1. lists-and-maps-with-for.tf shows how the **for** expression can be used inside lists and maps.
 
-We actually generate the outputs that show the list of public DNS addresses for the 3 EC2 instances in two ways, first using the **old splat syntax**:
+We first generate outputs that give the list of private DNS addresses for the 3 EC2 instances in two ways, first using the **old splat syntax**:
 ```
-output "public_addresses_old" {
-  value = aws_instance.ubuntu.*.public_dns
+output "private_addresses_old" {
+  value = aws_instance.ubuntu.*.private_dns
 }
 ```
 and then using the new **for** expression:
 ```
-output "public_addresses_new" {
+output "private_addresses_new" {
   value = [
     for instance in aws_instance.ubuntu:
-    instance.public_dns
+    instance.private_dns
   ]
 }
 ```
 Both of these give an output like this:
 ```
-public_addresses_new = [
+private_addresses_new = [
   "ec2-54-159-217-16.compute-1.amazonaws.com",
   "ec2-35-170-33-78.compute-1.amazonaws.com",
   "ec2-18-233-162-38.compute-1.amazonaws.com",
 ]
 ```
+When creating the EC2 instances, we only assign a public IP to one of them by using the conditional operator like this: `associate_public_ip_address = ( count.index == 1 ? true : false)`
 
-We also demonstrate the use of the **for** expression to convert the availability zones contained in the azs variable to upper case. We first do this in a list:
+We then use the conditional operator with lists in an output to show all the private and public IPs of the 3 instances:
 ```
-output "upper-azs-list" {
-  value = [for z in var.azs: upper(z)]
+output "ips" {
+  value = [
+    for instance in aws_instance.ubuntu:
+    (instance.public_ip != "" ? list(instance.private_ip, instance.public_ip) : list(instance.private_ip))
+  ]
+}
+```
+Note that this will eventually work using `[...]` instead of `list()`. This gives an output like:
+```
+ips = [
+  [
+    "172.16.10.218",
+  ],
+  [
+    "172.16.10.199",
+    "34.201.169.46",
+  ],
+  [
+    "172.16.10.250",
+  ],
+]
+```
+Note that ips consists of 3 lists, of which only the second has two items because only the second EC2 instance has a public IP.
+
+In the lists-and-maps-with-for.tf code, we demonstrate the use of the **for** expression to convert a list of lower-case letters to upper case. We first do this in a list:
+```
+output "upper-case-list" {
+  value = [for l in var.letters: upper(l)]
 }
 ```
 and then in a map:
 ```
-output "upper-azs-map" {
-  value = {for z in var.azs: z => upper(z)}
+output "upper-case-map" {
+  value = {for l in var.letters: l => upper(l)}
 }
 ```
 The first gives the output
 which gives the output:
 ```
-upper-azs-list = [
+upper-case-list = [
   "A",
   "B",
   "C",
@@ -82,7 +111,7 @@ upper-azs-list = [
 ```
 while the second gives:
 ```
-upper-azs-map = {
+upper-case-map = {
   "a" = "A"
   "b" = "B"
   "c" = "C"
@@ -135,7 +164,7 @@ Note that we don't use quotes around "list" because types are now first-class va
 
 We pass the variable into the aws_network_interface.rvt resource with `private_ips = var.interface_ips`. In the past, we would probably have set some string variable like interface_ip to "172.16.10.100" and then used `private_ips = ["${var.interface_ip}"]`. To some extent, we have just shifted the list brackets and quotes to the definition of the variable, but this does allow the specification of the resource to be clearer.
 
-Note: an apparent bug in the Terraform 0.12 alpha-1 prevented the creation of the aws_instance from working.  So, that is commented out at this time.
+We also create an EC2 instance.
 
 ## New Template Syntax
 The [new-template-syntax](./new-template-syntax) example illustrates how the new [Template Syntax](https://www.hashicorp.com/blog/terraform-0-12-template-syntax) can be used to support **if** conditionals and **for** expressions inside `%{}` template strings which are also referred to as directives.
