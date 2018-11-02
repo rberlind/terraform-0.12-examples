@@ -1,6 +1,14 @@
 # Terraform 0.12 Examples
 This repository contains some Terraform 0.12 examples that demonstrate new HCL features and other Terraform enhancements that are being added to Terraform 0.12. Each sub-directory contains a separate example that can be run separately from the others by running `terraform init` followed by `terraform apply`.
 
+The examples are:
+1. [First Class Expressions](./first-class-expressions)
+1. [For Expressions](./for-expressions)
+1. [Generalized Splat Operator](./generalized-splat-operator)
+1. [Rich Value Types](./rich-value-types)
+1. [New Template Syntax](./new-template-syntax)
+1. [Reliable JSON Syntax](./reliable-json-syntax)
+
 ## Setting Up
 1. Determine the location of the Terraform binary in your path. On a Mac of Linux machine, run `which terraform`. On a Windows machine, run `where terraform`.
 1. Move your current copy of the Terraform binary to a different location outside your path and remember where so you can restore it after using the Terraform 0.12 alpha. Also note the old location.
@@ -34,7 +42,7 @@ It is not easy to distinguish blocks from attributes of type map when looking at
 For more on the difference between attributes and blocks, see [Attributes and Blocks](https://github.com/hashicorp/terraform/blob/v0.12-alpha/website/docs/configuration/syntax.html.md#attributes-and-blocks)
 
 ## For Expressions Examples
-The [for-expressions](./for-expressions) example illustrates how the new [For Expression](https://github.com/hashicorp/terraform/blob/v0.12-alpha/website/docs/configuration/expressions.html.md#for-expressions) can be used to iterate across multiple items in lists. It does this for several outputs, illustrating the usefulness and power of the **for** expression in several ways.  We use two tf files in this example:
+The [For Expressions](./for-expressions) example illustrates how the new [For Expression](https://github.com/hashicorp/terraform/blob/v0.12-alpha/website/docs/configuration/expressions.html.md#for-expressions) can be used to iterate across multiple items in lists. It does this for several outputs, illustrating the usefulness and power of the **for** expression in several ways.  We use two tf files in this example:
 1. main.tf creates a VPC, subnet, and 3 EC2 instances and then generates outputs related to the DNS and IP addresses of the EC2 instances.
 1. lists-and-maps-with-for.tf shows how the **for** expression can be used inside lists and maps.
 
@@ -61,6 +69,9 @@ private_addresses_new = [
   "ec2-18-233-162-38.compute-1.amazonaws.com",
 ]
 ```
+
+Note that we also tried using the new [Full Splat Operator](https://www.hashicorp.com/blog/terraform-0-12-generalized-splat-operator) with an expression like `aws_instance.ubuntu[*].private_dns` but this does not yet work in either alpha-1 or alpha-2. However, the generalized splat operator with the `*` referencing multiple blocks within a single resource instance does work.  See the [generalized-splat-operator](./generalized-splat-operator) example.
+
 When creating the EC2 instances, we only assign a public IP to one of them by using the conditional operator like this: `associate_public_ip_address = ( count.index == 1 ? true : false)`
 
 We then use the conditional operator with lists in an output to show all the private and public IPs of the 3 instances:
@@ -119,8 +130,50 @@ upper-case-map = {
 }
 ```
 
+## Generalized Splat Operator
+The [Generalized Splat Operator](./generalized-splat-operator) example shows how the splat operator (`*`) can now be used to iterate across multiple blocks within a single resource instance. Recall that the old splat operator could only iterate across top-level attributes of a resource that had a count metadata attribute with a value greater than 1.
+
+In this example, we create an AWS security group with 2 ingress blocks and then create an output that iterates across the ingress blocks to give us both ports.
+
+Here is the entire code:
+```
+resource "aws_security_group" "allow_some_ingress" {
+  name        = "allow_some_ingress"
+  description = "Allow some inbound traffic"
+  vpc_id      = "vpc-0e56931573507c9dd"
+
+  ingress {
+    from_port   = 8200
+    to_port     = 8200
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 8500
+    to_port     = 8500
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+output "ports" {
+  value = aws_security_group.allow_some_ingress.ingress.*.from_port
+}
+```
+
+Note that the splat operator, `*`, occurs after "ingress". Before Terraform 0.12, this would not have worked.
+
+The output is:
+```
+ports = [
+  8500,
+  8200,
+]
+```
+
 ## Rich Value Types
-The [rich-value-types](./rich-value-types) example illustrates how the new [Rich Value Types](https://www.hashicorp.com/blog/terraform-0-12-rich-value-types) can be passed into and out of a module. It also shows that entire resources can be returned as outputs of a module.
+The [Rich Value Types](./rich-value-types) example illustrates how the new [Rich Value Types](https://www.hashicorp.com/blog/terraform-0-12-rich-value-types) can be passed into and out of a module. It also shows that entire resources can be returned as outputs of a module.
 
 The top-level main.tf file passes a single map with 4 strings into a module after defining the map as a local value:
 ```
@@ -168,7 +221,7 @@ We pass the variable into the aws_network_interface.rvt resource with `private_i
 We also create an EC2 instance.
 
 ## New Template Syntax
-The [new-template-syntax](./new-template-syntax) example illustrates how the new [Template Syntax](https://www.hashicorp.com/blog/terraform-0-12-template-syntax) can be used to support **if** conditionals and **for** expressions inside `%{}` template strings which are also referred to as directives.
+The [New Template Syntax](./new-template-syntax) example illustrates how the new [Template Syntax](https://www.hashicorp.com/blog/terraform-0-12-template-syntax) can be used to support **if** conditionals and **for** expressions inside `%{}` template strings which are also referred to as directives.
 
 Currently, the new template syntax can be used inside Terraform code just like the older `${}` interpolations. When the Template Provider 2.0 is released, it will also be possible to use the new template syntax inside template files loaded with the template_file data source. This example does include an example of the latter even though it does not work yet.
 
@@ -221,7 +274,7 @@ As mentioned above, when the Template Provider is released, it will also be poss
 For now, the output from the rigged template is suppressed since it treats the new template syntax strings as literals.
 
 ## Reliable JSON Syntax
-The [reliable-json-syntax](./reliable-json-syntax) example illustrates how the new [Reliable JSON Syntax](https://www.hashicorp.com/blog/terraform-0-12-reliable-json-syntax) makes life easier for customers using Terraform JSON files instead of HCL files.
+The [Reliable JSON Syntax](./reliable-json-syntax) example illustrates how the new [Reliable JSON Syntax](https://www.hashicorp.com/blog/terraform-0-12-reliable-json-syntax) makes life easier for customers using Terraform JSON files instead of HCL files.
 
 As you work through this example, you will need to change the extensions of the files so that only one has the `tf.json` extension at any time.
 

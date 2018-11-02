@@ -43,6 +43,12 @@ output "private_addresses_old" {
   value = aws_instance.ubuntu.*.private_dns
 }
 
+# This uses the new full splat operator (*)
+# But this does not work in 0.12 alpha-1 or alpha-2
+/*output "private_addresses_full_splat" {
+  value = [ aws_instance.ubuntu[*].private_dns ]
+}*/
+
 # This uses the new for expression
 output "private_addresses_new" {
   value = [
