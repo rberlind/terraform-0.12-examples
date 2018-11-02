@@ -131,7 +131,7 @@ upper-case-map = {
 ```
 
 ## Generalized Splat Operator
-The [Generalized Splat Operator](./generalized-splat-operator) example shows how the splat operator (`*`) can now be used to iterate across multiple blocks within a single resource instance. Recall that the old splat operator could only iterate across top-level attributes of a resource that had a count metadata attribute with a value greater than 1.
+The [Generalized Splat Operator](./generalized-splat-operator) example shows how the splat operator (`*`) can now be used to iterate across multiple blocks within a single resource instance. Recall that the old splat operator could only iterate across top-level attributes of a resource that had a count metadata attribute with a value greater than 1. While we mentioned above that the full splat operator (`[*]`) does not yet work, the generalized splat operator does work using `*` without brackets.
 
 In this example, we create an AWS security group with 2 ingress blocks and then create an output that iterates across the ingress blocks to give us both ports.
 
