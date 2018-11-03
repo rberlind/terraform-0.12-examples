@@ -8,7 +8,7 @@ provider "aws" {
 
 variable "vpc_name" {
   description = "name of the VPC"
-  default = "tf-0.12-example"
+  default = "tf-0.12-fce-example"
 }
 
 resource "aws_vpc" "my_vpc" {
@@ -23,7 +23,7 @@ resource "aws_subnet" "my_subnet" {
   cidr_block = "172.16.10.0/24"
   availability_zone = "us-west-2a"
   tags = {
-    Name = "tf-0.12-example"
+    Name = "tf-0.12-fce-example"
   }
 }
 
@@ -31,7 +31,7 @@ resource "aws_network_interface" "foo" {
   subnet_id = aws_subnet.my_subnet.id
   private_ips = ["172.16.10.100"]
   tags = {
-    Name = "tf-0.12-primary_network_interface"
+    Name = "tf-0.12-fce-primary_network_interface"
   }
 }
 
@@ -40,7 +40,7 @@ resource "aws_instance" "foo" {
   instance_type = "t2.micro"
 
   tags = {
-    Name = "tf-0.12-ec2-instance"
+    Name = "tf-0.12-fce-ec2-instance"
   }
 
   network_interface {

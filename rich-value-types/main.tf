@@ -8,7 +8,7 @@ provider "aws" {
 
 variable "vpc_name" {
   description = "name of the VPC"
-  default = "rvt-example-vpc"
+  default = "tf-0.12-rvt-example-vpc"
 }
 
 variable "vpc_cidr" {
@@ -18,7 +18,7 @@ variable "vpc_cidr" {
 
 variable "subnet_name" {
   description = "name for subnet"
-  default = "rvt-example-subnet"
+  default = "tf-0.12-rvt-example-subnet"
 }
 
 variable "subnet_cidr" {
@@ -50,7 +50,7 @@ resource "aws_network_interface" "rvt" {
   subnet_id = module.network.subnet_id
   private_ips = var.interface_ips
   tags = {
-    Name = "rvt-example-interface"
+    Name = "tf-0.12-rvt-example-interface"
   }
 }
 
@@ -59,7 +59,7 @@ resource "aws_instance" "rvt" {
   instance_type = "t2.micro"
 
   tags = {
-    Name = "rvt-example-instance"
+    Name = "tf-0.12-rvt-example-instance"
   }
 
   network_interface {
