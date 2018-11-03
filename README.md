@@ -9,11 +9,11 @@ The examples are:
 1. [New Template Syntax](./new-template-syntax)
 1. [Reliable JSON Syntax](./reliable-json-syntax)
 
-## Setting Up
+## Installing Terraform 0.12 Alpha-2
 1. Determine the location of the Terraform binary in your path. On a Mac of Linux machine, run `which terraform`. On a Windows machine, run `where terraform`.
 1. Move your current copy of the Terraform binary to a different location outside your path and remember where so you can restore it after using the Terraform 0.12 alpha. Also note the old location.
 1. On a Mac or Linux machine, rename the `~/.terraform.d` directory to something like `.terraformd`; on a Windows machine, rename `%USERPROFILE%\terraform.d` to `%USERPROFILE%\terraformd`. This way, you can restore the directory (if anything was in it) after the class.
-1. Download the Terraform 0.12 alpha for your OS from https://releases.hashicorp.com/terraform/0.12.0-alpha2.
+1. Download the Terraform 0.12 alpha-2 for your OS from https://releases.hashicorp.com/terraform/0.12.0-alpha2.
 1. Unzip the file and copy the terraform or terraform.exe binary to the location where your original terraform binary was. If you did not previously have the terraform binary deployed, copy it to a location within your path or edit your PATH environment variable to include the directory you put it in.
 1. Create a directory for the included providers and copy them to it:
   1. On a Mac, run `mkdir -p ~/.terraform.d/plugins/darwin_amd64` followed by `cp <install_directory>/terraform_0.12.0-alpha2_darwin_amd64/terraform-provider-* ~/.terraform.d/plugins/darwin_amd64/.`
@@ -21,6 +21,14 @@ The examples are:
   1. On a Windows laptop, run `mkdir %USERPROFILE%\terraform.d\plugins\windows_amd64` followed by `cp <install_directory>/terraform_0.12.0-alpha2_darwin_amd64/terraform-provider-* %USERPROFILE%/terraform.d/plugins/amd_amd64/.`  
 1. Clone this repository to your laptop with the command `git clone https://github.com/rberlind/terraform-0.12-examples.git`.
 1. Use `cd terraform-0.12-examples` to change into the directory that was created.
+
+## Exporting AWS Environment Variables
+Several of the examples provision some simple infrastructure into AWS.  You will therefore need to export your AWS keys. On Mac or Linux, do this with these commands:
+```
+export AWS_ACCESS_KEY_ID=<access_key>
+export AWS_SECRET_ACCESS_KEY=<secret_key>
+```
+On Windows, use `set` instead of `export`.
 
 ## First Class Expressions Example
 The [First Class Expressions](./first-class-expressions) example creates an AWS VPC, a subnet, a network interface, and an EC2 instance. It illustrates the following new features:

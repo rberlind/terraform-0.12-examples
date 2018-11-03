@@ -3,12 +3,7 @@ terraform {
 }
 
 provider "aws" {
-  region = var.aws_region
-}
-
-variable "aws_region" {
-  description = "AWS region"
-  default = "us-east-1"
+  region = "us-east-1"
 }
 
 resource "aws_vpc" "my_vpc" {

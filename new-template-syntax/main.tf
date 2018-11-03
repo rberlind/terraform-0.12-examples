@@ -1,3 +1,7 @@
+terraform {
+  required_version = ">= 0.12.0"
+}
+
 variable "names" {
   description = "list of names"
   default = ["Peter", "Paul", "Mary"]
@@ -15,7 +19,7 @@ variable "candidate" {
 
 data "template_file" "actual_vote" {
   template = file("actual_vote.txt")
-  
+
   vars = {
     voter = var.voter
     candidate = var.candidate
@@ -38,7 +42,7 @@ data "template_file" "rigged_vote" {
 # Also note use of ~ to suppress newlines
 output all_names {
   value = <<EOT
- 
+
 %{ for name in var.names ~}
 ${name}
 %{ endfor ~}

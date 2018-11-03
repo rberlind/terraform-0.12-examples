@@ -1,4 +1,8 @@
-# 
+terraform {
+  required_version = ">= 0.12.0"
+}
+
+# List of letters
 variable "letters" {
   description = "a list of letters"
   default = ["a", "b", "c"]
@@ -13,4 +17,3 @@ output "upper-case-list" {
 output "upper-case-map" {
   value = {for l in var.letters: l => upper(l)}
 }
-
